@@ -1,34 +1,38 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-void maxOfSubarrays(vector<int>& v, int K) {
-	int n = v.size();
-	deque<int> dq;
-	for (int i = 0; i < K; i++)
-		dq.push_back(i);
-
-	int max = max_element(v.begin() + (dq.front()), v.begin() + 1 + (dq.back())) - v.begin();
-	printf("%d ", v[max]);
-
-	for (int i = 0; i < (n - K); i++) {
-		dq.pop_front();
-		dq.push_back(K + i);
-
-		if (v[K + i] >= v[max]) {
-			max = K + i;
-			printf("%d ", v[max]);
+vector<int> maxOfSubarrays(vector<int>& v, int K) {
+	int size = v.size();
+	int i = 0, j = 0, maxIdx = 0;
+	vector<int> maxArray;
+	while (j < size) {
+		if (maxIdx != -1 && v[j] > v[maxIdx]) {
+			maxIdx = j;
 		}
-		else {
-			if (((K + i) - max) < K) {
-				printf("%d ", v[max]);
+
+		if (j - i + 1 == K) {
+			if (maxIdx != -1) {
+				maxArray.push_back(v[maxIdx]);
 			}
 			else {
-				max = max_element(v.begin() + (dq.front()), v.begin() + 1 + (dq.back())) - v.begin();
-				printf("%d ", v[max]);
+				if (v[j] > maxArray.back()) {
+					maxIdx = j;
+					maxArray.push_back(v[maxIdx]);
+				}
+				else {
+					maxIdx = max_element(v.begin() + i, v.begin() + j + 1) - v.begin();
+					maxArray.push_back((v[maxIdx]));
+				}
 			}
+
+			if (i == maxIdx) {
+				maxIdx = -1;
+			}
+			i++;
 		}
+		j++;
 	}
-	printf("\n");
+	return maxArray;
 }
 
 int main() {
@@ -54,13 +58,46 @@ int main() {
 			v.push_back(ele);
 		}
 
-		maxOfSubarrays(v, subarraySize);
-		// for (int x : result) {
-		// 	cout << x << endl;
-		// }
+		vector<int> result = maxOfSubarrays(v, subarraySize);
+		for (int x : result) {
+			cout << x << " ";
+		}
+		cout << endl;
 	}
 	return 0;
 }
+
+// My previous implementation using dequeue:
+
+// void maxOfSubarrays(vector<int>& v, int K) {
+// 	int n = v.size();
+// 	deque<int> dq;
+// 	for (int i = 0; i < K; i++)
+// 		dq.push_back(i);
+
+// 	int max = max_element(v.begin() + (dq.front()), v.begin() + 1 + (dq.back())) - v.begin();
+// 	printf("%d ", v[max]);
+
+// 	for (int i = 0; i < (n - K); i++) {
+// 		dq.pop_front();
+// 		dq.push_back(K + i);
+
+// 		if (v[K + i] >= v[max]) {
+// 			max = K + i;
+// 			printf("%d ", v[max]);
+// 		}
+// 		else {
+// 			if (((K + i) - max) < K) {
+// 				printf("%d ", v[max]);
+// 			}
+// 			else {
+// 				max = max_element(v.begin() + (dq.front()), v.begin() + 1 + (dq.back())) - v.begin();
+// 				printf("%d ", v[max]);
+// 			}
+// 		}
+// 	}
+// 	printf("\n");
+// }
 
 // Test cases:-
 
