@@ -1,6 +1,26 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// We'll store the current window highest index in maxIdx and all the window maximums in maxArray
+// maxIdx = -1 if the previous max just went out of window and we don't know the current window max
+// If maxIdx is not -1, and the latest encountered element (by j-pointer) is greater than v[maxIdx]..
+// ..then the latest encountered element must be the max in the latest window [i -> j] since it is..
+// ..greater than the prev. max, which means it must be greater than all the elements in the curr. window
+// This is because we slided it by 1 unit, so only 1 element from the prev. window is not in curr. window
+// That 1 excluded element from prev. window was also not its max since maxIdx != -1. This means that..
+// .. the current window's j-element is greater than all the elements in the current window.
+// If maxIdx == -1: This will only happen after i starts moving ie. after the window size is attained
+// The element that just went out of the current window due to i-pointer++ was the max. of prev. window
+// Due to this, we have no information about the max of the remaining K-1 elements in the current window
+// There are two possibilities:
+// If the latest encountered element v[j] is greater than max of the prev. window, then it is the maxIdx
+// Because prev Max is greater than all K-1 elements in the current window except newly encountered v[j]
+// If v[j] is greater than prev Max then v[j] is greater than the rest K-1 elements in the current window
+// If v[j] is not greater than prev Max, then find the max for the current window using iteration in K steps
+// This algorithm is O((n-K)*K) since in the worst case, we find max. in K steps for all (n-K) windows
+// Worst case is descending order sorted array -> O(nk - k^2) is equal to brute force time complexity Avg. case
+// But avg. case for this algorithm is better than O(nk - k^2), hence better than brute force avg. case
+
 vector<int> maxOfSubarrays(vector<int>& v, int K) {
 	int size = v.size();
 	int i = 0, j = 0, maxIdx = 0;
@@ -11,19 +31,15 @@ vector<int> maxOfSubarrays(vector<int>& v, int K) {
 		}
 
 		if (j - i + 1 == K) {
-			if (maxIdx != -1) {
-				maxArray.push_back(v[maxIdx]);
-			}
-			else {
+			if (maxIdx == -1) {
 				if (v[j] > maxArray.back()) {
 					maxIdx = j;
-					maxArray.push_back(v[maxIdx]);
 				}
 				else {
 					maxIdx = max_element(v.begin() + i, v.begin() + j + 1) - v.begin();
-					maxArray.push_back((v[maxIdx]));
 				}
 			}
+			maxArray.push_back(v[maxIdx]);
 
 			if (i == maxIdx) {
 				maxIdx = -1;
