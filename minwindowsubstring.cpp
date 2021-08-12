@@ -1,8 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-//
-
 string minWindowSubstring(string& s, string& text) {
 	unordered_map<char, int> t;                          // Hashmap to create frequency-value map for text
 	for (char ch : text) {
@@ -35,6 +33,29 @@ string minWindowSubstring(string& s, string& text) {
 		j++;                                             // If count != 0, we will keep doing j++ till we find a substring with count = 0
 	}
 
+	return sub;
+}
+
+string minWindowSubstringConcise(string& s, string& text) {
+	unordered_map<char, int> t;                            // Can also use t[128] = {0}
+	for (char ch : text)
+		t[ch]++;
+
+	string sub = "";
+	int i = 0, j = 0, count = t.size();
+	while (j < s.size()) {
+		if (t.find(s[j]) != t.end() && --t[s[j]] == 0)     // Pre-decrement to handle t[s[j]]-- and if() in one line
+			count--;                                       // Also, combined both if() together using &&
+
+		while (count == 0) {
+			if (sub.empty() || sub.size() > j - i + 1)
+				sub = s.substr(i, j - i + 1);
+			if (t.find(s[i]) != t.end() && ++t[s[i]] == 1) // Pre-increment to handle t[s[i]]++ and if() in one line
+				count++;                                   // Also, combined both if() together using &&
+			i++;
+		}
+		j++;
+	}
 	return sub;
 }
 
